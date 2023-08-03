@@ -1,0 +1,6 @@
+bitsandbytes
+gradio==3.39.0
+accelerate==0.21.0
+transformers
+xformers
+langchain
