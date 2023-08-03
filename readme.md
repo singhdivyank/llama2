@@ -1,10 +1,10 @@
 # Using Llama2 as an alternate to ChatGPT for question answering over a file
 
-Meta released open source [Llama2](https://ai.meta.com/llama/) as an LLM model, this repository attempts to utilise it for question answering over a pdf/word/csv file instead of using ChatGPT API
+Meta released open source [Llama2](https://ai.meta.com/llama/) as an LLM model, this repository attempts to utilize it for question answering over a pdf/word/CSV file instead of using ChatGPT API
 
 There are two files- `download_version.py` and `using_llama.py`
 
-* In the former a quantized Llama2 model is downnloaded and implemented using CTransformer and LangChain
+* In the former a quantized Llama2 model is downloaded and implemented using CTransformer and LangChain
 * In the later Llama2 model from Meta repository and implemented as HuggingFaceLLM using Llama_index framework
 
 ## Flow
@@ -17,7 +17,7 @@ There are two files- `download_version.py` and `using_llama.py`
 7. Send this to Llama
 
 ## Requirements
-1. Langchain (designing prompts, history retention and chains)
+1. Langchain (designing prompts, history retention, and chains)
 2. llama_index (for HuggingFace implementation)
 3. FAISS (vector store)
 4. Transformer for embeddings (HuggingFace `Sentence Transformer`)
@@ -46,7 +46,7 @@ Note: there are many available models, you can choose any as per the `model card
 
 Note: currently implemented model, `Llama-2-7b-chat-hf`
 
-**A word of caution: this iplementation consumes time and is memory expensive**
+**A word of caution: this implementation consumes time and is memory expensive**
 
 ## Sample UI
 ![](image.png)
