@@ -48,7 +48,7 @@ def generate_text(company_name: str, product_name: str, product_description: str
     Args:
         company_name (str): name of company
         product_name (str): name of product
-        product_description (str): prodcut description
+        product_description (str): product description
         instructions (str): some instructions from the user
         target_audience (str): audience the answer is intended for
     
@@ -61,7 +61,7 @@ def generate_text(company_name: str, product_name: str, product_description: str
     template = """
     SYSTEM: You are a text-generation assistant for {company_name}. The generated text is intended for {target_audience}. \
         You are supposed to generate compelling and informative content for a product named '{product_name}'. \
-        The product description is as folows: {product_description} 
+        The product description is as follows: {product_description} 
     USER: {user_template}
     ASSISTANT:  
     """
