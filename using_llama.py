@@ -18,8 +18,16 @@ from llama_index.llms import HuggingFaceLLM
 from llama_index.prompts.prompts import SimpleInputPrompt
 # generate embeddings using HuggingFace
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from transformers import BitsAndBytesConfig
 
 access_token = os.getenv("HF_KEY")
+BNB_CONFIG = BitsAndBytesConfig(
+    llm_int8_enable_fp32_cpu_offload=True,
+    load_in_4bit = True, 
+    bnb_4bit_quant_type = 'nf4', 
+    bnb_4bit_use_double_quant = True, 
+    bnb_4bit_compute_dtype = torch.bfloat16
+)
 
 
 class ChatApp:
@@ -41,22 +49,16 @@ class ChatApp:
             embeddings (LangchainEmbedding): model to generate embeddings
         """
 
-        # prompt for LLM model
-        system_prompt = """You are a Q&A assistant. Your goal is to answer questions as accurately as possible based on the instructions and context provided."""
-        # wraps around the LLM prompt
-        query_wrapper_prompt = SimpleInputPrompt("<|USER|>{query_str}<|ASSISTANT|>")
         # define LLM model
         llm = HuggingFaceLLM(
             context_window = 4096,
             max_new_tokens = 256,
             generate_kwargs = {"temperature": 0.0, "do_sample": False},
-            system_prompt = system_prompt,
-            query_wrapper_prompt = query_wrapper_prompt,
             tokenizer_name = self.model_name,
             model_name = self.model_name,
             device_map = 'auto',
             # to run on CPU
-            model_kwargs = {"torch_dtype": torch.float16 , "load_in_8bit":True, 'use_auth_token': access_token}
+            model_kwargs = {"torch_dtype": torch.float16 , "load_in_8bit":True, 'use_auth_token': access_token, 'quantization_config': BNB_CONFIG}
         )
         # get list of embeddings for document
         embeddings = LangchainEmbedding(
@@ -108,9 +110,9 @@ class ChatApp:
             print(f"Exception while handling error :: Exception :: {str(error)}")
             return None
 
-    def get_answer(self, fileobj: gradio.File, search_query: str) -> Union[str, list]:
+    def get_answer(self, fileobj: gradio.File, search_query: str) -> Union[str, str]:
         """
-        get answers to user question from Llama2 using API
+        get answers to user questions from Llama2 using API
 
         Args:
             fileobj (gradio.File) : uploaded file
@@ -122,21 +124,17 @@ class ChatApp:
         """
 
         answer, sources = 'could not generate an answer', []
-        chat_history = []
         
         db = self.load_document(file_name=fileobj.name)
         if db:
             # perform chat
-            chat_engine = db.as_chat_engine()
+            query_engine = db.as_query_engine()
             try:
-                llm_response = chat_engine.chat(
-                    message = search_query, 
-                    chat_history = chat_history
-                )
+                llm_response = query_engine.query(search_query)
                 # answer to query
                 answer = llm_response.response
-                # answer sources 
-                sources = llm_response.sources
+                # TODO- answer sources 
+                sources = ''
                 # TODO- update chat history
             except Exception as error:
                 print(f"Error while generating answer :: Exception :: {str(error)}")
@@ -159,7 +157,7 @@ def gradio_interface(inputs: list=[gradio.File(label = "Input file", file_types 
     chat_ob = ChatApp()
     demo = gradio.Interface(fn = chat_ob.get_answer, inputs = inputs, outputs = outputs)
     demo.launch(share = False)
-    # uncomment for public URL (accessible for 3 days, deploy on cloud and it is accessible for a lifetime)
+    # uncomment for public URL (accessible for 3 days, deploy and its accessible for a lifetime)
     # demo.launch(share = True)
 
 
