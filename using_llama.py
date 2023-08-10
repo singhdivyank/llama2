@@ -123,7 +123,7 @@ class ChatApp:
             sources (list): answer source from document
         """
 
-        answer, sources = 'could not generate an answer', []
+        answer, sources = 'could not generate an answer', ''
         
         db = self.load_document(file_name=fileobj.name)
         if db:
@@ -134,8 +134,7 @@ class ChatApp:
                 # answer to query
                 answer = llm_response.response
                 # TODO- answer sources 
-                sources = ''
-                # TODO- update chat history
+                sources = llm_response.get_formatted_sources()
             except Exception as error:
                 print(f"Error while generating answer :: Exception :: {str(error)}")
         
