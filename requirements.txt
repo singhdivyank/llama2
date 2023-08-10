@@ -8,3 +8,4 @@ llama-index==0.7.16
 pip-chill==1.0.3
 pypdf==3.14.0
 sentence-transformers==2.2.2
+bitsandbytes
